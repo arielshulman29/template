@@ -14,8 +14,9 @@ server/              API server (Fastify + TypeScript), run by Node
   index.ts           routes: GET /api/health, GET /api/rooms
   db.ts              Postgres connection pool (reads DATABASE_URL)
   .env.example       copy to .env: local settings and secrets (never committed)
-db/init.sql          creates the rooms table and sample rows (first start only)
-compose.yaml         Postgres 17 in Docker
+  Dockerfile         production image for the server
+compose.dev.yaml     development only: Postgres 17 in Docker on your laptop
+db/init.sql          development only: creates the rooms table and sample rows
 package.json         workspace root: scripts that run both parts
 pnpm-workspace.yaml  the two packages: client and server
 .oxlintrc.json       linter config (Oxlint)
@@ -32,7 +33,7 @@ pnpm-workspace.yaml  the two packages: client and server
 ```sh
 pnpm install
 cp server/.env.example server/.env
-pnpm db:up     # start Postgres in Docker
+pnpm db:up     # start the development database (Postgres in Docker)
 pnpm dev       # client: http://localhost:5173  server: http://localhost:3000
 ```
 
@@ -46,7 +47,8 @@ Open http://localhost:5173. You should see three study rooms, loaded from the da
 | `pnpm build` | builds the client into `client/dist` |
 | `pnpm typecheck` | TypeScript checks for both parts |
 | `pnpm lint` | Oxlint over the whole repo |
-| `pnpm db:up` / `pnpm db:down` | start / stop Postgres |
+| `pnpm db:up` / `pnpm db:down` | start / stop the development database |
+| `pnpm db:reset` | wipe the development database and re-run `db/init.sql` |
 
 To run a script in one part only: `pnpm --filter server dev`. To add a package to one part: `pnpm --filter client add zod`.
 
@@ -58,9 +60,20 @@ browser → Vite dev server (:5173) → /api/* forwarded → Fastify (:3000) →
 browser ← JSON  ←──────────────────────────────────────────┘
 ```
 
-## Resetting the database
+## Development vs production
 
-`docker compose down -v` deletes the data volume. The next `pnpm db:up` starts fresh and runs `db/init.sql` again.
+**Development** (your laptop): `compose.dev.yaml` runs a throwaway Postgres with a plain-text password, and `db/init.sql` fills it with sample rows the first time it starts. `pnpm db:reset` wipes it and starts over. None of this is used in production.
+
+**Production**: only the server is shipped, as a Docker image. The client is built (`pnpm build`) into static files for a CDN, and the database is a managed Postgres whose URL the hosting platform passes in as `DATABASE_URL`. Schema changes there go through migrations, not `init.sql`.
+
+Build and run the server image (from the repository root):
+
+```sh
+docker build -f server/Dockerfile -t rooms-server .
+docker run -p 3000:3000 -e DATABASE_URL=postgres://user:pass@host:5432/db rooms-server
+```
+
+The image installs only the server's production dependencies (Fastify, pg) and runs `node index.ts`: no build step, Node strips the types.
 
 ## Things to try
 

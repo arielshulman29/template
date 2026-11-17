@@ -10,8 +10,9 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "lint": "oxlint",
-    "db:up": "docker compose up -d --wait",
-    "db:down": "docker compose down"
+    "db:up": "docker compose -f compose.dev.yaml up -d --wait",
+    "db:down": "docker compose -f compose.dev.yaml down",
+    "db:reset": "docker compose -f compose.dev.yaml down -v && docker compose -f compose.dev.yaml up -d --wait"
   },
   "devDependencies": {
     "oxlint": "^1.94.0"

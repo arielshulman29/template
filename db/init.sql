@@ -1,4 +1,7 @@
--- Runs once, the first time the database container starts with an empty volume.
+-- DEVELOPMENT ONLY: sets up the local database from compose.dev.yaml.
+-- Postgres runs this file once, the first time the container starts with an
+-- empty volume (reset with: pnpm db:reset). It is never run in production:
+-- there, schema changes are applied with migrations.
 CREATE TABLE rooms (
   id         SERIAL PRIMARY KEY,
   name       TEXT    NOT NULL,

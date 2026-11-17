@@ -1,3 +1,8 @@
+# DEVELOPMENT ONLY: a throwaway Postgres for your laptop.
+# - The password is in plain text and the data lives in a local Docker volume.
+# - db/init.sql seeds sample rows the first time the volume is empty.
+# In production the server connects to a managed database (its DATABASE_URL is
+# set by the hosting platform), and schema changes go through migrations.
 services:
   db:
     image: postgres:17
