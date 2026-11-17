@@ -24,7 +24,7 @@ pnpm-workspace.yaml  the two packages: client and server
 
 ## Requirements
 
-- **Node.js 24** (LTS). `nvm use` picks it up from `.nvmrc`. Node 22.18+ also works: the server's `.ts` files run directly, Node strips the types.
+- **Node.js 26** (the current LTS). `nvm use` picks it up from `.nvmrc`. Node 22.18+ also works: the server's `.ts` files run directly, Node strips the types.
 - **pnpm**: `npm install -g pnpm`
 - **Docker** (Docker Desktop, or Docker Engine with Compose)
 
