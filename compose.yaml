@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: rooms
+      POSTGRES_PASSWORD: rooms
+      POSTGRES_DB: rooms
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rooms"]
+      interval: 2s
+      retries: 15
+
+volumes:
+  db-data:
